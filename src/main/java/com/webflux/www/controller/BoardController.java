@@ -2,6 +2,7 @@ package com.webflux.www.controller;
 
 import com.webflux.www.domain.Board;
 import com.webflux.www.domain.BoardDTO;
+import com.webflux.www.domain.User;
 import com.webflux.www.repository.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +34,11 @@ public class BoardController {
     //게시글 상세
     @GetMapping("/{id}")
     public Mono<Board> boardDetail(@PathVariable long id) {
+        return boardService.selectBoard(id);
+    }
+
+    @GetMapping("/test/{id}")
+    public Mono<Board> userDetail(@PathVariable Long id) {
         return boardService.selectBoard(id);
     }
 

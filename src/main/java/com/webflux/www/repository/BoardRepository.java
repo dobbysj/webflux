@@ -13,4 +13,5 @@ public interface BoardRepository extends R2dbcRepository<Board, Long> {
     Flux<Board> findAllByDeleteYn(Pageable pageable, String deleteYn);
 
     Flux<Board> findAllByDeleteYn(String deleteYn);
+
 }
