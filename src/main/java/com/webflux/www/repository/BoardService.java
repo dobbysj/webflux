@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
+import reactor.util.function.Tuple3;
 
+import java.time.Duration;
 import java.util.List;
 
 @Service
@@ -41,14 +43,41 @@ public class BoardService {
                 ;
     }
 
+//    public Mono<Board> selectBoard(Long boardId){
+//        Mono<Board> boardMono =
+//                boardRepository.findById(boardId)
+//                        .flatMap(board -> Mono.just(board)
+//                                .zipWith(commentService.findAllByBoardId(boardId).collectList())
+//                                .map(t->t.getT1().withComments(t.getT2()))
+//                                .zipWith(userRepository.findByUserIdAndDeleteYn(board.getWriterId(), "N"))
+//                                .map(t->t.getT1().withUser(t.getT2()))
+//                        )
+//                ;
+//        return boardMono;
+//    }
     public Mono<Board> selectBoard(Long boardId){
         Mono<Board> boardMono =
                 boardRepository.findById(boardId)
                         .flatMap(board -> Mono.just(board)
-                                .zipWith(commentService.findAllByBoardId(boardId).collectList())
-                                .map(t->t.getT1().withComments(t.getT2()))
                                 .zipWith(userRepository.findByUserIdAndDeleteYn(board.getWriterId(), "N"))
                                 .map(t->t.getT1().withUser(t.getT2()))
+                                .zipWith(commentService.findAllByBoardId(boardId).collectList())
+                                .map(t->t.getT1().withComments(t.getT2()))
+                        )
+                ;
+        return boardMono;
+    }
+
+    public Mono<Board> selectBoard2(Long boardId){
+        Mono<Board> boardMono =
+                boardRepository.findById(boardId)
+                        .flatMap(board ->
+                                Mono.zip(Mono.just(board), userRepository.findByUserIdAndDeleteYn(board.getWriterId(), "N"), commentService.findAllByBoardId(boardId).collectList())
+                                    .map(t-> {
+                                        t.getT1().withUser(t.getT2());
+                                        t.getT1().withComments(t.getT3());
+                                        return t.getT1();
+                                    })
                         )
                 ;
         return boardMono;
@@ -147,5 +176,9 @@ public class BoardService {
 //                .zipWith(userRepository.findByUserIdAndDeleteYn(1L, "N"))
 //                ;
 //    }
+
+    public void mergeFluxes(){
+
+    }
 
 }
